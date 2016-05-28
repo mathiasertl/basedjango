@@ -1,0 +1,6 @@
+*.sw[opx]
+*.py[co]
+/bin/
+/include/
+/lib/
+/pip-selfcheck.json
