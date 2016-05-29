@@ -27,19 +27,33 @@ class TranslatedTextWidget(forms.MultiWidget):
         ]
 
         translated_widget = kwargs.pop('translated_widget', self.translated_widget)
-        for code, lang in settings.LANGUAGES:
-            widgets.append(translated_widget(attrs={'data-lang': code}))
+        for code, _lang in settings.LANGUAGES:
+            attrs = {'data-lang': code}
+            if code != self.lang:
+                attrs['style'] = 'display: none;'
+
+            widgets.append(translated_widget(attrs=attrs))
         kwargs.setdefault('widgets', widgets)
         super(TranslatedTextWidget, self).__init__(*args, **kwargs)
 
-    def decompress(self, value):
-        # This sets the default language of the select box
-        lang = get_language()
-        if lang not in settings.LANGUAGES and '-' in lang:
-            # The default settings.LANGUAGE_CODE is 'en-us', which is not in settings.LANGUAGES,
-            # so we fallback to just 'en' in this case.
-            lang = lang.split('-', 1)[0]
+    @property
+    def lang(self):
+        """Returns the currently active language of this thread.
 
+        If the current language is in a dialect that is not in settings.LANGUAGES, the main
+        language is returned instead. This is important because the default installation uses
+        settings.LANGUAGE_CODE = "en-us", which is not part of settings.LANGUAGES.
+        """
+
+        lang = get_language()
+        supported = [k for k, v in settings.LANGUAGES]
+        if lang not in supported and '-' in lang:
+            # The default settings.LANGUAGE_CODE is 'en-us', which is not in settings.LANGUAGES, so
+            # we fallback to just 'en' in this case.
+            return lang.split('-', 1)[0]
+        return lang
+
+    def decompress(self, value):
         if not value:
-            return [lang] + ['' for l in settings.LANGUAGES]
-        return [lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]
+            return [self.lang] + ['' for l in settings.LANGUAGES]
+        return [self.lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]
