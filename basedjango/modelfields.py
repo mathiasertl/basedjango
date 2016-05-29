@@ -26,13 +26,13 @@ class TranslatedText(dict):
     pass
 
 
-class TranslatedTextField(models.TextField):
+class TranslatedCharField(models.TextField):
     def __init__(self, *args, **kwargs):
         kwargs['default'] = {k: '' for k, v in settings.LANGUAGES}
-        super(TranslatedTextField, self).__init__(*args, **kwargs)
+        super(TranslatedCharField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TranslatedTextField, self).deconstruct()
+        name, path, args, kwargs = super(TranslatedCharField, self).deconstruct()
         del kwargs['default']
         return name, path, args, kwargs
 
@@ -56,4 +56,8 @@ class TranslatedTextField(models.TextField):
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', TranslatedTextFormField)
-        return super(TranslatedTextField, self).formfield(**kwargs)
+        return super(TranslatedCharField, self).formfield(**kwargs)
+
+
+class TranslatedTextField(TranslatedCharField):
+    pass

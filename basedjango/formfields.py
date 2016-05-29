@@ -22,7 +22,7 @@ from .widgets import TranslatedTextWidget
 
 class TranslatedTextFormField(forms.MultiValueField):
     translated_field = forms.CharField
-    translated_widget = forms.Textarea
+    translated_widget = forms.TextInput
 
     _TranslatedText = None
 
