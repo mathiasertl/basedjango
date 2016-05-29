@@ -57,3 +57,8 @@ class TranslatedTextWidget(forms.MultiWidget):
         if not value:
             return [self.lang] + ['' for l in settings.LANGUAGES]
         return [self.lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]
+
+    class Media:
+        js = (
+            'basedjango/js/translatedtextwidget.js',
+        )
