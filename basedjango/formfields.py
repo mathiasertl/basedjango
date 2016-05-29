@@ -34,6 +34,7 @@ class TranslatedTextFormField(forms.MultiValueField):
         ]
 
         translated_widget = kwargs.get('widget', self.translated_widget)
+        print(translated_widget)
         self.widget = TranslatedTextWidget(translated_widget=translated_widget)
 
         field_kwargs = kwargs.copy()

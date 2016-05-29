@@ -15,8 +15,11 @@
 
 import json
 
+from django import forms
 from django.conf import settings
 from django.db import models
+from django.contrib.admin.widgets import AdminTextareaWidget
+from django.contrib.admin.widgets import AdminTextInputWidget
 
 from .formfields import TranslatedTextFormField
 
@@ -27,6 +30,8 @@ class TranslatedText(dict):
 
 
 class TranslatedCharField(models.TextField):
+    admin_widget = AdminTextInputWidget
+
     def __init__(self, *args, **kwargs):
         kwargs['default'] = {k: '' for k, v in settings.LANGUAGES}
         super(TranslatedCharField, self).__init__(*args, **kwargs)
@@ -56,8 +61,12 @@ class TranslatedCharField(models.TextField):
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', TranslatedTextFormField)
+
+        if kwargs.get('widget') == AdminTextareaWidget:
+            kwargs['widget'] = self.admin_widget
+
         return super(TranslatedCharField, self).formfield(**kwargs)
 
 
 class TranslatedTextField(TranslatedCharField):
-    pass
+    admin_widget = AdminTextareaWidget
