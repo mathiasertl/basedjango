@@ -70,3 +70,6 @@ class TranslatedTextWidget(forms.MultiWidget):
         js = (
             'basedjango/js/translatedtextwidget.js',
         )
+        css = {
+            'all': ('basedjango/css/translatedtextwidget.css', ),
+        }
