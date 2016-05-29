@@ -15,18 +15,37 @@
 
 import json
 
-from django import forms
 from django.conf import settings
 from django.db import models
 from django.contrib.admin.widgets import AdminTextareaWidget
 from django.contrib.admin.widgets import AdminTextInputWidget
+from django.utils.translation import get_language
 
 from .formfields import TranslatedTextFormField
 
 
 class TranslatedText(dict):
     # might be useful for future extensions to have a subclass
-    pass
+    def code(self, code):
+        if code not in self and '-' in code:
+            code = code.split('-', 1)[0]
+
+        return self.get(code, 'untranslated')
+
+    def has_code(self, code):
+        if self.get(code):
+            return True
+        if '-' in code:
+            code = code.split('-', 1)[0]
+            return bool(self.get(code))
+        return False
+
+    @property
+    def has_default_language(self):
+        return self.has_code(settings.LANGUAGE_CODE)
+
+    def __str__(self):
+        return self.code(get_language())
 
 
 class TranslatedCharField(models.TextField):
