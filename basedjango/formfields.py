@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License along with basedjango. If not,
 # see <http://www.gnu.org/licenses/>
 
+from importlib import import_module
+
 from django import forms
 from django.conf import settings
 from .widgets import TranslatedTextWidget
@@ -21,6 +23,8 @@ from .widgets import TranslatedTextWidget
 class TranslatedTextFormField(forms.MultiValueField):
     translated_field = forms.CharField
     translated_widget = forms.Textarea
+
+    _TranslatedText = None
 
     def __init__(self, *args, **kwargs):
         language_chooser = forms.ChoiceField(choices=settings.LANGUAGES)
@@ -41,10 +45,17 @@ class TranslatedTextFormField(forms.MultiValueField):
                 initial=translations.get(lang, ''), **field_kwargs))
         super(TranslatedTextFormField, self).__init__(fields=fields, require_all_fields=False)
 
+    @property
+    def TranslatedText(self):
+        # we cannot import this on the module level, because it would be a circular import
+        if self._modelfields is None:
+            mod = import_module('.modelfields')
+            self._TranslatedText = mod.TranslatedText
+        return self._TranslatedText
+
     def compress(self, data_list):
         data_list.pop()  # first value is the language
         translations = data_list[1:]
         languages = [l for l, _ in settings.LANGUAGES]
 
-        from .modelfields import TranslatedText
-        return TranslatedText(**{k: v for k, v in zip(languages, translations) if v})
+        return self.TranslatedText(**{k: v for k, v in zip(languages, translations) if v})
