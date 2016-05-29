@@ -33,8 +33,13 @@ class TranslatedTextWidget(forms.MultiWidget):
         super(TranslatedTextWidget, self).__init__(*args, **kwargs)
 
     def decompress(self, value):
-        lang = [get_language()]
+        # This sets the default language of the select box
+        lang = get_language()
+        if lang not in settings.LANGUAGES and '-' in lang:
+            # The default settings.LANGUAGE_CODE is 'en-us', which is not in settings.LANGUAGES,
+            # so we fallback to just 'en' in this case.
+            lang = lang.split('-', 1)[0]
 
         if not value:
-            return lang + ['' for l in settings.LANGUAGES]
-        return lang + [value.get(l, '') for l, _ in settings.LANGUAGES]
+            return [lang] + ['' for l in settings.LANGUAGES]
+        return [lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]

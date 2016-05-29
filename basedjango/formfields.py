@@ -37,19 +37,18 @@ class TranslatedTextFormField(forms.MultiValueField):
         self.widget = TranslatedTextWidget(translated_widget=translated_widget)
 
         field_kwargs = kwargs.copy()
-        translations = field_kwargs.pop('initial')  # this is the dict
+        field_kwargs.pop('initial')  # this is the dict
         field_kwargs['required'] = False
 
         for lang, _name in settings.LANGUAGES:
-            fields.append(self.translated_field(
-                initial=translations.get(lang, ''), **field_kwargs))
+            fields.append(self.translated_field(**field_kwargs))
         super(TranslatedTextFormField, self).__init__(fields=fields, require_all_fields=False)
 
     @property
     def TranslatedText(self):
         # we cannot import this on the module level, because it would be a circular import
-        if self._modelfields is None:
-            mod = import_module('.modelfields')
+        if self._TranslatedText is None:
+            mod = import_module('basedjango.modelfields')
             self._TranslatedText = mod.TranslatedText
         return self._TranslatedText
 
