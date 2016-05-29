@@ -64,6 +64,7 @@ class TranslatedCharField(models.TextField):
 
         if kwargs.get('widget') == AdminTextareaWidget:
             kwargs['widget'] = self.admin_widget
+            kwargs['on_admin'] = True
 
         return super(TranslatedCharField, self).formfield(**kwargs)
 

@@ -65,7 +65,10 @@ class TranslatedTextWidget(forms.MultiWidget):
 
         return '<div class="basedjango-lang-wrapper">' + selector + translations + '</div>'
 
+
+class TranslatedTextAdminWidget(TranslatedTextWidget):
     class Media:
+        extends = False
         js = (
             'basedjango/js/translatedtextwidget.js',
         )

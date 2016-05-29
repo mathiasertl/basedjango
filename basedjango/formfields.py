@@ -18,6 +18,7 @@ from importlib import import_module
 from django import forms
 from django.conf import settings
 from .widgets import TranslatedTextWidget
+from .widgets import TranslatedTextAdminWidget
 
 
 class TranslatedTextFormField(forms.MultiValueField):
@@ -27,6 +28,7 @@ class TranslatedTextFormField(forms.MultiValueField):
     _TranslatedText = None
 
     def __init__(self, *args, **kwargs):
+        on_admin = kwargs.pop('on_admin', False)
         language_chooser = forms.ChoiceField(choices=settings.LANGUAGES)
 
         fields = [
@@ -34,7 +36,11 @@ class TranslatedTextFormField(forms.MultiValueField):
         ]
 
         translated_widget = kwargs.get('widget', self.translated_widget)
-        self.widget = TranslatedTextWidget(translated_widget=translated_widget)
+        widget_cls = TranslatedTextWidget
+        if on_admin is True:
+            widget_cls = TranslatedTextAdminWidget
+
+        self.widget = widget_cls(translated_widget=translated_widget)
 
         field_kwargs = kwargs.copy()
         field_kwargs.pop('initial')  # this is the dict
