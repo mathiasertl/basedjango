@@ -58,6 +58,14 @@ class TranslatedTextWidget(forms.MultiWidget):
             return [self.lang] + ['' for l in settings.LANGUAGES]
         return [self.lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]
 
+    def format_output(self, rendered_widgets):
+        selector = rendered_widgets.pop(0)
+        translations = super(TranslatedTextWidget, self).format_output(rendered_widgets)
+        translations = '<div class="basedjango-translations">' + translations + '</div>'
+
+        return '<div class="basedjango-lang-wrapper">' + selector + translations + '</div>'
+
+
     class Media:
         js = (
             'basedjango/js/translatedtextwidget.js',
