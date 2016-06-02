@@ -95,7 +95,7 @@ class TranslatedTextFormField(forms.MultiValueField):
         self.widget = widget_cls(translated_widget=translated_widget)
 
         field_kwargs = kwargs.copy()
-        field_kwargs.pop('initial')  # this is the dict
+        field_kwargs.pop('initial', {})  # this is the dict
         field_kwargs['required'] = False
 
         for lang, _name in settings.LANGUAGES:
