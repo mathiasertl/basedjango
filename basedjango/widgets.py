@@ -25,7 +25,7 @@ class TranslatedTextWidget(forms.MultiWidget):
         self.languages = kwargs.pop('languages', settings.LANGUAGES)
 
         widgets = []
-        if len(self.languages) > 1:
+        if len(self.languages) > 2:
             widgets.append(forms.Select(choices=self.languages, attrs={
                 'class': 'basedjango-lang-selector'}))
             widgets.append(forms.Select(choices=self.languages, attrs={
@@ -60,7 +60,7 @@ class TranslatedTextWidget(forms.MultiWidget):
 
     def decompress(self, value):
         decompressed = []
-        if len(self.languages) > 1:
+        if len(self.languages) > 2:
             decompressed.append(self.lang)
             decompressed.append(self.lang)
 
@@ -70,7 +70,7 @@ class TranslatedTextWidget(forms.MultiWidget):
 
     def format_output(self, rendered_widgets):
         selectors = ''
-        if len(self.languages) > 1:
+        if len(self.languages) > 2:
             selectors = rendered_widgets.pop(0) + rendered_widgets.pop(0)
 
         translations = super(TranslatedTextWidget, self).format_output(rendered_widgets)

@@ -85,7 +85,7 @@ class TranslatedTextFormField(forms.MultiValueField):
         fields = []
 
         # add a language chooser if we currently support more then one language.
-        if len(self.languages) > 1:
+        if len(self.languages) > 2:
             fields.append(forms.ChoiceField(choices=self.languages))
             fields.append(forms.ChoiceField(choices=self.languages))
 
@@ -107,17 +107,14 @@ class TranslatedTextFormField(forms.MultiValueField):
                                                       required=kwargs.get('required', True))
 
     def compress(self, data_list):
-        if len(self.languages) > 1:
+        if data_list == []:
+            # If the user did not enter anything, we receive an empty list. Note that this method
+            # is never called if this field is required (a ValidationError was already raised).
+            return {}
+
+        if len(self.languages) > 2:
             data_list.pop(0)
             data_list.pop(0)  # first two values are the selected languages
         languages = [l for l, _ in self.languages]
-
-        # If we only have a single language and no input, data_list is an empty list and we
-        # have to set an empty value for that language.
-        #
-        # TODO: This method is never called if require=True and we don't enter a value. This is
-        #       checked somewhere further up in this case.
-        if len(languages) == 1 and data_list == []:
-            data_list = ['']
 
         return TranslatedText(**{k: v for k, v in zip(languages, data_list) if v})
