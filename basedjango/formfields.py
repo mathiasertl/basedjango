@@ -17,8 +17,57 @@ from importlib import import_module
 
 from django import forms
 from django.conf import settings
+from django.contrib.admin.widgets import AdminTextInputWidget
+from django.contrib.admin.widgets import AdminTextareaWidget
+
 from .widgets import TranslatedTextWidget
 from .widgets import TranslatedTextAdminWidget
+
+
+class SingleLanguageCharField(forms.CharField):
+    """A formfield that contains the text for a single translated language.
+
+    This field returns a dictionary of the language, suitable e.g. for a
+    :py:class:`models.TranslatedCharField`. Example::
+
+        >>> from django.conf import settings
+        >>> from basedjango.formfields import SingleLanguageCharField
+        >>> settings.LANGUAGE_CODE
+        'en-us'
+        >>> f = SingleLanguageCharField()
+        >>> f.clean('foo')
+        {'en-us': 'foo'}
+
+
+    Parameters
+    ----------
+
+    language : str, optional
+        The language this field uses. The default is ``settings.LANGUAGE_CODE``.
+    admin : bool, optional
+        If True, the default widget is ``AdminTextInputWidget`` instead of just ``TextInput``. Use
+        this parameter in admin forms.
+    """
+    def __init__(self, *args, **kwargs):
+        self.language = kwargs.pop('language', settings.LANGUAGE_CODE)
+        if kwargs.pop('admin', False):
+            kwargs.setdefault('widget', AdminTextInputWidget)
+
+        super(SingleLanguageCharField, self).__init__(*args, **kwargs)
+
+    def clean(self, value):
+        return {self.language: value, }
+
+
+class SingleLanguageTextField(SingleLanguageCharField):
+    """Same as SingleLanguageCharField``, except it uses a Textarea by default."""
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.pop('admin', False):
+            kwargs.setdefault('widget', AdminTextareaWidget)
+        else:
+            kwargs.setdefault('widget', forms.Textarea)
+        super(SingleLanguageTextField, self).__init__(*args, **kwargs)
 
 
 class TranslatedTextFormField(forms.MultiValueField):
@@ -29,11 +78,12 @@ class TranslatedTextFormField(forms.MultiValueField):
 
     def __init__(self, *args, **kwargs):
         on_admin = kwargs.pop('on_admin', False)
-        language_chooser = forms.ChoiceField(choices=settings.LANGUAGES)
 
-        fields = [
-            language_chooser,
-        ]
+        fields = []
+
+        # add a language chooser if we currently support more then one language.
+        if len(settings.LANGUAGES) > 1:
+            fields.append(forms.ChoiceField(choices=settings.LANGUAGES))
 
         translated_widget = kwargs.get('widget', self.translated_widget)
         widget_cls = TranslatedTextWidget
