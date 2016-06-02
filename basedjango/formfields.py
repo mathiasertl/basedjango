@@ -60,7 +60,7 @@ class SingleLanguageCharField(forms.CharField):
         return attrs
 
     def clean(self, value):
-        return {self.language: value, }
+        return TranslatedText(**{self.language: value})
 
 
 class SingleLanguageTextField(SingleLanguageCharField):
@@ -107,8 +107,8 @@ class TranslatedTextFormField(forms.MultiValueField):
         super(TranslatedTextFormField, self).__init__(fields=fields, require_all_fields=False)
 
     def compress(self, data_list):
-        data_list.pop()  # first value is the language
-        translations = data_list[1:]
+        if len(self.languages) > 1:
+            data_list.pop(0)  # first value is the selected language
         languages = [l for l, _ in self.languages]
 
-        return TranslatedText(**{k: v for k, v in zip(languages, translations) if v})
+        return TranslatedText(**{k: v for k, v in zip(languages, data_list) if v})
