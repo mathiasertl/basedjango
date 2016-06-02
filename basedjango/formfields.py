@@ -54,6 +54,11 @@ class SingleLanguageCharField(forms.CharField):
 
         super(SingleLanguageCharField, self).__init__(*args, **kwargs)
 
+    def widget_attrs(self, widget):
+        attrs = super(SingleLanguageCharField, self).widget_attrs(widget)
+        attrs.setdefault('data-lang', self.language)
+        return attrs
+
     def clean(self, value):
         return {self.language: value, }
 
