@@ -101,6 +101,9 @@ class TranslatedTextFormField(forms.MultiValueField):
 
         for lang, _name in self.languages:
             fields.append(self.translated_field(**field_kwargs))
+        if len(self.languages) == 1:
+            print('fields: ', fields)
+
         super(TranslatedTextFormField, self).__init__(fields=fields, require_all_fields=False)
 
     def compress(self, data_list):

@@ -24,9 +24,10 @@ class TranslatedTextWidget(forms.MultiWidget):
     def __init__(self, *args, **kwargs):
         self.languages = kwargs.pop('languages', settings.LANGUAGES)
 
-        widgets = [
-            forms.Select(choices=self.languages, attrs={'class': 'basedjango-lang-selector'}),
-        ]
+        widgets = []
+        if len(self.languages) > 1:
+            widgets.append(forms.Select(choices=self.languages, attrs={
+                'class': 'basedjango-lang-selector'}))
 
         translated_widget = kwargs.pop('translated_widget', self.translated_widget)
         for code, _lang in self.languages:
