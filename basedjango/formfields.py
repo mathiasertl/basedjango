@@ -93,7 +93,7 @@ class TranslatedTextFormField(forms.MultiValueField):
         if on_admin is True:
             widget_cls = TranslatedTextAdminWidget
 
-        self.widget = widget_cls(translated_widget=translated_widget)
+        self.widget = widget_cls(languages=self.languages, translated_widget=translated_widget)
 
         field_kwargs = kwargs.copy()
         field_kwargs.pop('initial', {})  # this is the dict
