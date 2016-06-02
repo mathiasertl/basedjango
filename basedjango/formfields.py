@@ -80,12 +80,13 @@ class TranslatedTextFormField(forms.MultiValueField):
 
     def __init__(self, *args, **kwargs):
         on_admin = kwargs.pop('on_admin', False)
+        self.languages = kwargs.pop('languages', settings.LANGUAGES)
 
         fields = []
 
         # add a language chooser if we currently support more then one language.
-        if len(settings.LANGUAGES) > 1:
-            fields.append(forms.ChoiceField(choices=settings.LANGUAGES))
+        if len(self.languages) > 1:
+            fields.append(forms.ChoiceField(choices=self.languages))
 
         translated_widget = kwargs.get('widget', self.translated_widget)
         widget_cls = TranslatedTextWidget
@@ -98,13 +99,13 @@ class TranslatedTextFormField(forms.MultiValueField):
         field_kwargs.pop('initial', {})  # this is the dict
         field_kwargs['required'] = False
 
-        for lang, _name in settings.LANGUAGES:
+        for lang, _name in self.languages:
             fields.append(self.translated_field(**field_kwargs))
         super(TranslatedTextFormField, self).__init__(fields=fields, require_all_fields=False)
 
     def compress(self, data_list):
         data_list.pop()  # first value is the language
         translations = data_list[1:]
-        languages = [l for l, _ in settings.LANGUAGES]
+        languages = [l for l, _ in self.languages]
 
         return TranslatedText(**{k: v for k, v in zip(languages, translations) if v})
