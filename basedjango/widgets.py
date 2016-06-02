@@ -31,13 +31,13 @@ class TranslatedTextWidget(forms.MultiWidget):
             widgets.append(forms.Select(choices=self.languages, attrs={
                 'class': 'basedjango-lang-selector'}))
 
-        translated_widget = kwargs.pop('translated_widget', self.translated_widget)
+        self.translated_widget = kwargs.pop('translated_widget', self.translated_widget)
         for code, _lang in self.languages:
             attrs = {'data-lang': code}
             if code != self.lang:
                 attrs['style'] = 'display: none;'
 
-            widgets.append(translated_widget(attrs=attrs))
+            widgets.append(self.translated_widget(attrs=attrs))
         kwargs.setdefault('widgets', widgets)
         super(TranslatedTextWidget, self).__init__(*args, **kwargs)
 
@@ -69,6 +69,12 @@ class TranslatedTextWidget(forms.MultiWidget):
         return decompressed + [value.get(l, '') for l, _ in self.languages]
 
     def format_output(self, rendered_widgets):
+        top_classes = ['basedjango-lang-wrapper']
+        if issubclass(self.translated_widget, forms.TextInput):
+            top_classes.append('basedjango-lang-char')
+        else:
+            top_classes.append('basedjango-lang-text')
+
         selectors = ''
         if len(self.languages) > 2:
             selectors = rendered_widgets.pop(0) + rendered_widgets.pop(0)
@@ -76,7 +82,9 @@ class TranslatedTextWidget(forms.MultiWidget):
         translations = super(TranslatedTextWidget, self).format_output(rendered_widgets)
         translations = '<div class="basedjango-translations">' + translations + '</div>'
 
-        return '<div class="basedjango-lang-wrapper">' + selectors + translations + '</div>'
+        return '<div class="%(top_classes)s">' % {
+            'top_classes': ' '.join(top_classes),
+        } + selectors + translations + '</div>'
 
 
 class TranslatedTextAdminWidget(TranslatedTextWidget):
