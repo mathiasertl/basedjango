@@ -110,4 +110,9 @@ class TranslatedTextFormField(forms.MultiValueField):
             data_list.pop(0)  # first value is the selected language
         languages = [l for l, _ in self.languages]
 
+        # If we only have a single language and no input, data_list is an empty list and we
+        # have to set an empty value for that language.
+        if len(languages) == 1 and data_list == []:
+            data_list = ['']
+
         return TranslatedText(**{k: v for k, v in zip(languages, data_list) if v})
