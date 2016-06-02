@@ -112,6 +112,9 @@ class TranslatedTextFormField(forms.MultiValueField):
 
         # If we only have a single language and no input, data_list is an empty list and we
         # have to set an empty value for that language.
+        #
+        # TODO: This method is never called if require=True and we don't enter a value. This is
+        #       checked somewhere further up in this case.
         if len(languages) == 1 and data_list == []:
             data_list = ['']
 
