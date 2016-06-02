@@ -1,0 +1,2 @@
+recursive-include basedjango/static *
+recursive-include basedjango/templates *

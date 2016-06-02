@@ -1,6 +1,8 @@
 *.sw[opx]
 *.py[co]
 /bin/
+/basedjango.egg-info/
+/dist/
 /include/
 /lib/
 /pip-selfcheck.json
