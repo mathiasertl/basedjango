@@ -87,6 +87,7 @@ class TranslatedTextFormField(forms.MultiValueField):
         # add a language chooser if we currently support more then one language.
         if len(self.languages) > 1:
             fields.append(forms.ChoiceField(choices=self.languages))
+            fields.append(forms.ChoiceField(choices=self.languages))
 
         translated_widget = kwargs.get('widget', self.translated_widget)
         widget_cls = TranslatedTextWidget
@@ -107,7 +108,8 @@ class TranslatedTextFormField(forms.MultiValueField):
 
     def compress(self, data_list):
         if len(self.languages) > 1:
-            data_list.pop(0)  # first value is the selected language
+            data_list.pop(0)
+            data_list.pop(0)  # first two values are the selected languages
         languages = [l for l, _ in self.languages]
 
         # If we only have a single language and no input, data_list is an empty list and we
