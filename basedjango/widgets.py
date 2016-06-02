@@ -57,9 +57,13 @@ class TranslatedTextWidget(forms.MultiWidget):
         return lang
 
     def decompress(self, value):
+        decompressed = []
+        if len(self.languages) > 1:
+            decompressed.append(self.lang)
+
         if not value:
-            return [self.lang] + ['' for l in self.languages]
-        return [self.lang] + [value.get(l, '') for l, _ in self.languages]
+            return decompressed + ['' for l in self.languages]
+        return decompressed + [value.get(l, '') for l, _ in self.languages]
 
     def format_output(self, rendered_widgets):
         selector = rendered_widgets.pop(0)
