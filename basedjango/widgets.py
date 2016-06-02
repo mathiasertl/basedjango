@@ -22,12 +22,14 @@ class TranslatedTextWidget(forms.MultiWidget):
     translated_widget = forms.TextInput
 
     def __init__(self, *args, **kwargs):
+        self.languages = kwargs.pop('languages', settings.LANGUAGES)
+
         widgets = [
-            forms.Select(choices=settings.LANGUAGES, attrs={'class': 'basedjango-lang-selector'}),
+            forms.Select(choices=self.languages, attrs={'class': 'basedjango-lang-selector'}),
         ]
 
         translated_widget = kwargs.pop('translated_widget', self.translated_widget)
-        for code, _lang in settings.LANGUAGES:
+        for code, _lang in self.languages:
             attrs = {'data-lang': code}
             if code != self.lang:
                 attrs['style'] = 'display: none;'
@@ -46,7 +48,7 @@ class TranslatedTextWidget(forms.MultiWidget):
         """
 
         lang = get_language()
-        supported = [k for k, v in settings.LANGUAGES]
+        supported = [k for k, v in self.languages]
         if lang not in supported and '-' in lang:
             # The default settings.LANGUAGE_CODE is 'en-us', which is not in settings.LANGUAGES, so
             # we fallback to just 'en' in this case.
@@ -55,8 +57,8 @@ class TranslatedTextWidget(forms.MultiWidget):
 
     def decompress(self, value):
         if not value:
-            return [self.lang] + ['' for l in settings.LANGUAGES]
-        return [self.lang] + [value.get(l, '') for l, _ in settings.LANGUAGES]
+            return [self.lang] + ['' for l in self.languages]
+        return [self.lang] + [value.get(l, '') for l, _ in self.languages]
 
     def format_output(self, rendered_widgets):
         selector = rendered_widgets.pop(0)
